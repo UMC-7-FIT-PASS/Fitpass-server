@@ -19,11 +19,12 @@ public class FitnessController {
     }
 
     @GetMapping("/recommend")
-    public ResponseEntity<List<Map<String, Object>>> searchFitness(
+    public ResponseEntity<List<Map<String, Object>>> recommendFitness(
             @RequestParam double latitude,
             @RequestParam double longitude)
     {
         List<Map<String, Object>> response = FitnessRecommendService.getRecommendFitnessAsMap(latitude, longitude);
         return ResponseEntity.ok(response);
     }
+
 }
