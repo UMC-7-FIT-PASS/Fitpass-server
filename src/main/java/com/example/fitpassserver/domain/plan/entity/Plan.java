@@ -73,7 +73,7 @@ public class Plan extends BaseEntity {
     }
 
     public boolean isTargetForCancel() {
-        return LocalDate.now().isEqual(planDate.plusMonths(1).plusDays(4)) && this.paymentStatus.equals(
+        return LocalDate.now().isEqual(planDate.plusMonths(1).plusDays(2)) && this.paymentStatus.equals(
                 PaymentStatus.INSUFFICIENT);
     }
 
