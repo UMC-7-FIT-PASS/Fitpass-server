@@ -1,11 +1,8 @@
 package com.example.fitpassserver.domain.plan.service;
 
-import com.example.fitpassserver.domain.coin.service.CoinService;
 import com.example.fitpassserver.domain.coinPaymentHistory.entity.PaymentStatus;
-import com.example.fitpassserver.domain.coinPaymentHistory.service.CoinPaymentHistoryService;
 import com.example.fitpassserver.domain.coinPaymentHistory.service.KakaoPaymentService;
 import com.example.fitpassserver.domain.kakaoNotice.util.KakaoAlimtalkUtil;
-import com.example.fitpassserver.domain.member.sms.util.SmsCertificationUtil;
 import com.example.fitpassserver.domain.plan.entity.Plan;
 import com.example.fitpassserver.domain.plan.entity.PlanType;
 import com.example.fitpassserver.domain.plan.exception.PlanErrorCode;
@@ -26,10 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PlanScheduler {
     private final PlanRepository planRepository;
     private final KakaoPaymentService paymentService;
-    private final CoinPaymentHistoryService coinPaymentHistoryService;
-    private final SmsCertificationUtil smsCertificationUtil;
     private final KakaoAlimtalkUtil kakaoAlimtalkUtil;
-    private final CoinService coinService;
 
     @Scheduled(cron = "0 0 0 * * ?")
     @Async
