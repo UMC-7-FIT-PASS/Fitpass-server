@@ -3,10 +3,8 @@ package com.example.fitpassserver.domain.plan.service;
 import com.example.fitpassserver.domain.coinPaymentHistory.entity.CoinPaymentHistory;
 import com.example.fitpassserver.domain.coinPaymentHistory.entity.PaymentStatus;
 import com.example.fitpassserver.domain.member.entity.Member;
-import com.example.fitpassserver.domain.plan.dto.event.PlanCancelSuccessEvent;
-import com.example.fitpassserver.domain.plan.dto.event.PlanChangeAllSuccessEvent;
-import com.example.fitpassserver.domain.plan.dto.event.PlanChangeSuccessEvent;
-import com.example.fitpassserver.domain.plan.dto.event.PlanPaymentAllSuccessEvent;
+import com.example.fitpassserver.domain.plan.dto.event.PlanCancelEvent;
+import com.example.fitpassserver.domain.plan.dto.event.PlanSuccessEvent;
 import com.example.fitpassserver.domain.plan.dto.request.PlanChangeRequestDTO;
 import com.example.fitpassserver.domain.plan.dto.response.ChangePlanDTO;
 import com.example.fitpassserver.domain.plan.entity.Plan;
@@ -65,7 +63,8 @@ public class PlanService {
         String origin = plan.getPlanType().getName();
         plan.changePlanType(PlanType.NONE);
         planRepository.save(plan);
-        eventPublisher.publishEvent(new PlanCancelSuccessEvent(plan.getMember().getPhoneNumber(), origin));
+        eventPublisher.publishEvent(
+                new PlanCancelEvent.PlanCancelSuccessEvent(plan.getMember().getPhoneNumber(), origin));
     }
 
     public Plan getPlan(Member member) {
@@ -97,7 +96,7 @@ public class PlanService {
         if (plan.getPlanType().getName().equals(dto.planName())) {
             throw new PlanException(PlanErrorCode.PLAN_CHANGE_DUPLICATE_ERROR);
         }
-        eventPublisher.publishEvent(new PlanChangeSuccessEvent(plan, planType));
+        eventPublisher.publishEvent(new PlanSuccessEvent.PlanChangeSuccessEvent(plan, planType));
         return new ChangePlanDTO(plan, planType);
     }
 
@@ -108,7 +107,8 @@ public class PlanService {
         plan.resetPaymentCount();
         planRepository.save(plan);
         eventPublisher.publishEvent(
-                new PlanChangeAllSuccessEvent(plan.getMember().getPhoneNumber(), plan.getPlanType().getName()));
+                new PlanSuccessEvent.PlanChangeAllSuccessEvent(plan.getMember().getPhoneNumber(),
+                        plan.getPlanType().getName()));
     }
 
 
@@ -116,7 +116,8 @@ public class PlanService {
         plan.updatePlanSubscriptionInfo();
         planRepository.save(plan);
         eventPublisher.publishEvent(
-                new PlanPaymentAllSuccessEvent(plan.getMember().getPhoneNumber(), plan.getPlanType().getName(),
+                new PlanSuccessEvent.PlanPaymentAllSuccessEvent(plan.getMember().getPhoneNumber(),
+                        plan.getPlanType().getName(),
                         history.getPaymentPrice(), history.getPaymentMethod()));
     }
 }

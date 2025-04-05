@@ -8,9 +8,8 @@ import com.example.fitpassserver.domain.coinPaymentHistory.dto.request.SinglePay
 import com.example.fitpassserver.domain.coinPaymentHistory.dto.response.KakaoPaymentApproveDTO;
 import com.example.fitpassserver.domain.coinPaymentHistory.dto.response.KakaoPaymentResponseDTO;
 import com.example.fitpassserver.domain.member.entity.Member;
-import com.example.fitpassserver.domain.plan.dto.event.PlanCancelUpdateEvent;
+import com.example.fitpassserver.domain.plan.dto.event.PlanCancelEvent;
 import com.example.fitpassserver.domain.plan.dto.event.PlanSuccessEvent;
-import com.example.fitpassserver.domain.plan.dto.event.RegularSubscriptionApprovedEvent;
 import com.example.fitpassserver.domain.plan.dto.request.SIDCheckDTO;
 import com.example.fitpassserver.domain.plan.dto.request.SubscriptionCancelRequestDTO;
 import com.example.fitpassserver.domain.plan.dto.request.SubscriptionRequestDTO;
@@ -167,7 +166,7 @@ public class KakaoPaymentService {
                     log.error("API Error {}", e.getMessage());
                 });
         SubscriptionResponseDTO dto = response.block();
-        eventPublisher.publishEvent(new RegularSubscriptionApprovedEvent(plan, dto));
+        eventPublisher.publishEvent(new PlanSuccessEvent.RegularSubscriptionApprovedEvent(plan, dto));
     }
 
     /*
@@ -217,7 +216,7 @@ public class KakaoPaymentService {
                     log.error("API Error {}", e.getMessage());
                 });
         PlanSubscriptionResponseDTO dto = response.block();
-        eventPublisher.publishEvent(new PlanSuccessEvent(member, dto));
+        eventPublisher.publishEvent(new PlanSuccessEvent.PlanApproveSuccessEvent(member, dto));
         return dto;
     }
 
@@ -265,7 +264,7 @@ public class KakaoPaymentService {
                     log.error("API Error {}", e.getMessage());
                 });
         KakaoCancelResponseDTO dto = response.block();
-        eventPublisher.publishEvent(new PlanCancelUpdateEvent(plan));
+        eventPublisher.publishEvent(new PlanCancelEvent.PlanCancelUpdateEvent(plan));
         return dto;
     }
 

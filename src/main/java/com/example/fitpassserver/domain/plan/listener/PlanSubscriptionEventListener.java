@@ -7,13 +7,8 @@ import com.example.fitpassserver.domain.coinPaymentHistory.service.CoinPaymentHi
 import com.example.fitpassserver.domain.kakaoNotice.util.KakaoAlimtalkUtil;
 import com.example.fitpassserver.domain.member.entity.Member;
 import com.example.fitpassserver.domain.member.sms.util.SmsCertificationUtil;
-import com.example.fitpassserver.domain.plan.dto.event.PlanCancelSuccessEvent;
-import com.example.fitpassserver.domain.plan.dto.event.PlanCancelUpdateEvent;
-import com.example.fitpassserver.domain.plan.dto.event.PlanChangeAllSuccessEvent;
-import com.example.fitpassserver.domain.plan.dto.event.PlanChangeSuccessEvent;
-import com.example.fitpassserver.domain.plan.dto.event.PlanPaymentAllSuccessEvent;
+import com.example.fitpassserver.domain.plan.dto.event.PlanCancelEvent;
 import com.example.fitpassserver.domain.plan.dto.event.PlanSuccessEvent;
-import com.example.fitpassserver.domain.plan.dto.event.RegularSubscriptionApprovedEvent;
 import com.example.fitpassserver.domain.plan.dto.response.PlanSubscriptionResponseDTO;
 import com.example.fitpassserver.domain.plan.entity.Plan;
 import com.example.fitpassserver.domain.plan.service.PlanService;
@@ -38,7 +33,7 @@ public class PlanSubscriptionEventListener {
 
     @EventListener
     @Transactional
-    public void handle(PlanSuccessEvent event) {
+    public void handle(PlanSuccessEvent.PlanApproveSuccessEvent event) {
         Member member = event.member();
         PlanSubscriptionResponseDTO dto = event.dto();
         Plan plan = planService.createNewPlan(member, dto.itemName(), dto.sid());
@@ -50,15 +45,16 @@ public class PlanSubscriptionEventListener {
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Async
-    public void handle(PlanPaymentAllSuccessEvent event) {
+    public void handle(PlanSuccessEvent.PlanPaymentAllSuccessEvent event) {
 //        smsCertificationUtil.sendPlanPaymentSMS(event.phoneNumber(), event.planName(), event.totalAmount());
-        kakaoAlimtalkUtil.coinPaymentAlimtalk(event.phoneNumber(), event.totalAmount(), event.planName(), event.paymentMethod());
+        kakaoAlimtalkUtil.coinPaymentAlimtalk(event.phoneNumber(), event.totalAmount(), event.planName(),
+                event.paymentMethod());
         log.info("{} 에게 문자 발송 완료", event.phoneNumber());
     }
 
     @EventListener
     @Transactional
-    public void handle(RegularSubscriptionApprovedEvent event) {
+    public void handle(PlanSuccessEvent.RegularSubscriptionApprovedEvent event) {
         Plan plan = event.plan();
         Member member = plan.getMember();
         Coin coin = coinService.createSubscriptionNewCoin(member, plan);
@@ -70,14 +66,14 @@ public class PlanSubscriptionEventListener {
 
     @EventListener
     @Transactional
-    public void handle(PlanChangeSuccessEvent event) {
+    public void handle(PlanSuccessEvent.PlanChangeSuccessEvent event) {
         Plan plan = event.plan();
         planService.changeSubscriptionInfo(plan, event.planType());
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Async
-    public void handle(PlanChangeAllSuccessEvent event) {
+    public void handle(PlanSuccessEvent.PlanChangeAllSuccessEvent event) {
 //        smsCertificationUtil.sendPlanChangeAlert(event.phoneNumber(), event.planName());
         kakaoAlimtalkUtil.planChangeAlimtalk(event.phoneNumber(), event.planName());
         log.info("{} 에게 문자 발송 완료", event.phoneNumber());
@@ -85,14 +81,14 @@ public class PlanSubscriptionEventListener {
 
     @EventListener
     @Transactional
-    public void handle(PlanCancelUpdateEvent event) {
+    public void handle(PlanCancelEvent.PlanCancelUpdateEvent event) {
         planService.cancelNewPlan(event.plan());
     }
 
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Async
-    public void handle(PlanCancelSuccessEvent event) {
+    public void handle(PlanCancelEvent.PlanCancelSuccessEvent event) {
 //        smsCertificationUtil.sendPlanInActiveAlert(event.phoneNumber(), event.planName());
         kakaoAlimtalkUtil.deactivatePlanAlimtalk(event.phoneNumber(), event.planName());
         log.info("{} 에게 문자 발송 완료", event.phoneNumber());
