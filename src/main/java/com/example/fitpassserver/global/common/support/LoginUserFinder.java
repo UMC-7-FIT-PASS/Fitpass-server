@@ -9,7 +9,5 @@ public interface LoginUserFinder {
 
     boolean existsByLoginId(String loginId);
 
-    boolean existsByName(String name);
-
     boolean existsByPhoneNumber(String phoneNumber);
 }

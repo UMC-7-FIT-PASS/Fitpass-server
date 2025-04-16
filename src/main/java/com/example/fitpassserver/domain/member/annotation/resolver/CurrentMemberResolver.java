@@ -1,8 +1,10 @@
 package com.example.fitpassserver.domain.member.annotation.resolver;
 
 import com.example.fitpassserver.domain.member.annotation.CurrentMember;
-import com.example.fitpassserver.domain.member.entity.Member;
-import com.example.fitpassserver.domain.member.service.query.MemberQueryService;
+import com.example.fitpassserver.domain.member.exception.MemberErrorCode;
+import com.example.fitpassserver.domain.member.exception.MemberException;
+import com.example.fitpassserver.global.common.support.LoginUser;
+import com.example.fitpassserver.global.common.support.LoginUserFinder;
 import com.example.fitpassserver.global.jwt.util.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,21 +21,26 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 public class CurrentMemberResolver implements HandlerMethodArgumentResolver {
 
     private final JwtProvider jwtProvider;
-    private final MemberQueryService memberQueryService;
+    private final LoginUserFinder loginUserFinder;
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.hasParameterAnnotation(CurrentMember.class) && parameter.getParameterType().isAssignableFrom(Member.class);
+        return parameter.hasParameterAnnotation(CurrentMember.class)
+                && LoginUser.class.isAssignableFrom(parameter.getParameterType());
     }
 
     @Override
-    public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
+    public Object resolveArgument(MethodParameter parameter,
+                                  ModelAndViewContainer mavContainer,
+                                  NativeWebRequest webRequest,
+                                  WebDataBinderFactory binderFactory) throws Exception {
         String header = webRequest.getHeader("Authorization");
 
         if (header != null) {
             String token = header.split(" ")[1];
             String loginId = jwtProvider.getLoginId(token);
-            return memberQueryService.getMember(loginId);
+            return loginUserFinder.findByLoginId(loginId)
+                    .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND));
         }
 
         return null;
