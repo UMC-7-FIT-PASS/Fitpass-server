@@ -1,9 +1,6 @@
 package com.example.fitpassserver.domain.notice.service;
 
-import com.example.fitpassserver.domain.member.entity.Member;
 import com.example.fitpassserver.domain.member.entity.Role;
-import com.example.fitpassserver.domain.member.exception.MemberErrorCode;
-import com.example.fitpassserver.domain.member.exception.MemberException;
 import com.example.fitpassserver.domain.member.repository.MemberRepository;
 import com.example.fitpassserver.domain.notice.controller.response.NoticeDetailResponse;
 import com.example.fitpassserver.domain.notice.controller.response.NoticeHomeSlideResponse;
@@ -13,12 +10,14 @@ import com.example.fitpassserver.domain.notice.exception.NoticeErrorCode;
 import com.example.fitpassserver.domain.notice.exception.NoticeException;
 import com.example.fitpassserver.domain.notice.repository.NoticeRepository;
 import com.example.fitpassserver.global.aws.s3.service.S3Service;
+import com.example.fitpassserver.global.common.support.LoginUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,9 +39,7 @@ public class NoticeService {
     }
 
 
-    public Map<String, Object> getNoticeList(Pageable pageable, Long memberId) {
-        Member member = memberRepository.findById(memberId).orElseThrow(
-                () -> new MemberException(MemberErrorCode.NOT_FOUND));
+    public Map<String, Object> getNoticeList(Pageable pageable, LoginUser user) {
 
         Page<Notice> noticePage = noticeRepository.findPublishedNoticesByIsMemberSlideTrue(pageable);
 
