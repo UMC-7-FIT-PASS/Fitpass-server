@@ -66,6 +66,14 @@ public class Owner extends BaseEntity implements LoginUser {
     @Column(name = "role", nullable = false)
     private Role role = Role.OWNER;
 
+    @Column(name = "latitude")
+    @Builder.Default
+    private Double latitude = 37.5665;
+
+    @Column(name = "longitude")
+    @Builder.Default
+    private Double longitude = 126.9780;
+
     @Column(name = "is_agree", nullable = false)
     private boolean isAgree;
 
@@ -77,6 +85,9 @@ public class Owner extends BaseEntity implements LoginUser {
 
     @Column(name = "is_marketing_agreed", nullable = false)
     private boolean isMarketingAgreed;
+
+    @Column(name = "is_location_agreed", nullable = false)
+    private boolean isLocationAgreed;
 
     @Column(name = "is_personal_information_agreed", nullable = false)
     private boolean isPersonalInformaionAgreed;
@@ -126,9 +137,9 @@ public class Owner extends BaseEntity implements LoginUser {
         this.password = newPassword;
     }
 
-//    public void updateLastLoginAt(LocalDateTime lastLoginAt) {
-//        this.lastLoginAt = lastLoginAt;
-//    }
+    public void updateLastLoginAt(LocalDateTime lastLoginAt) {
+        this.lastLoginAt = lastLoginAt;
+    }
 
 
     @Override
@@ -149,6 +160,16 @@ public class Owner extends BaseEntity implements LoginUser {
     @Override
     public Role getRole() {
         return role;
+    }
+
+    @Override
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    @Override
+    public Double getLongitude() {
+        return longitude;
     }
 
 

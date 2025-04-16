@@ -15,4 +15,9 @@ public interface LoginUser {
 
     String getName();
 
+    Double getLatitude();
+
+    Double getLongitude();
+
+
 }

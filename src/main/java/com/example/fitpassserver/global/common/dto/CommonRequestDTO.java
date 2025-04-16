@@ -87,6 +87,10 @@ public class CommonRequestDTO {
         protected boolean isThirdPartyAgreed;
 
         @NotNull
+        @JsonProperty("locationAgreed")
+        boolean isLocationAgreed;
+
+        @NotNull
         @JsonProperty("marketingAgreed")
         protected boolean isMarketingAgreed;
     }

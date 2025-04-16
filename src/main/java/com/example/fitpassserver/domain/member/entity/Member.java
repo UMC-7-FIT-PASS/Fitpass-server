@@ -192,4 +192,14 @@ public class Member extends BaseEntity implements LoginUser {
     public Role getRole() {
         return role;
     }
+
+    @Override
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    @Override
+    public Double getLongitude() {
+        return longitude;
+    }
 }

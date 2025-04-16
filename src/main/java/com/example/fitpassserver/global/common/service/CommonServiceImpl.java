@@ -72,6 +72,7 @@ public class CommonServiceImpl implements CommonService {
                     .fitnessIds(fitnessIds)
                     .memberId(owner.getId())
                     .memberName(owner.getName())
+                    .isLocationAgreed(owner.isLocationAgreed())
                     .accessToken(jwtProvider.createAccessToken(owner))
                     .refreshToken(jwtProvider.createRefreshToken(owner))
                     .build();

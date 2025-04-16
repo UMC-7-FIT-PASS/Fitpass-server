@@ -25,9 +25,6 @@ public class MemberRequestDTO {
 
         private String company_name;
 
-        @NotNull
-        @JsonProperty("locationAgreed")
-        boolean isLocationAgreed;
     }
 
     /**
