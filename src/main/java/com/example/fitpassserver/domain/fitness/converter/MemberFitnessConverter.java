@@ -6,13 +6,13 @@ import com.example.fitpassserver.domain.fitness.dto.response.MemberFitnessResDTO
 import com.example.fitpassserver.domain.fitness.entity.Fitness;
 import com.example.fitpassserver.domain.fitness.entity.MemberFitness;
 import com.example.fitpassserver.domain.fitness.entity.Status;
-import com.example.fitpassserver.domain.fitness.service.FitnessImageService;
 import com.example.fitpassserver.domain.fitness.util.DistanceCalculator;
 import com.example.fitpassserver.domain.member.entity.Member;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 public class MemberFitnessConverter {
@@ -61,13 +61,11 @@ public class MemberFitnessConverter {
                 .build();
     }
 
-    public static MemberFitnessResDTO.MemberFitnessGroupDTO toGroupDto(
+    public static MemberFitnessResDTO.NoneProgressGroupDTO toGroupDto1(
             List<MemberFitness> memberFitnessList, Map<Long, String> imageUrlMap) {
 
         List<MemberFitnessResDTO.MemberFitnessPreviewDTO> none = new ArrayList<>();
         List<MemberFitnessResDTO.MemberFitnessPreviewDTO> progress = new ArrayList<>();
-        List<MemberFitnessResDTO.MemberFitnessPreviewDTO> done = new ArrayList<>();
-        List<MemberFitnessResDTO.MemberFitnessPreviewDTO> reviewed = new ArrayList<>();
 
         for (MemberFitness memberFitness : memberFitnessList) {
             Long fitnessId = memberFitness.getFitness().getId();
@@ -77,16 +75,44 @@ public class MemberFitnessConverter {
             switch (memberFitness.getStatus()) {
                 case NONE -> none.add(dto);
                 case PROGRESS -> progress.add(dto);
-                case DONE -> done.add(dto);
-                case REVIEWED -> reviewed.add(dto);
             }
         }
 
-        return MemberFitnessResDTO.MemberFitnessGroupDTO.builder()
+        return MemberFitnessResDTO.NoneProgressGroupDTO.builder()
                 .none(none)
                 .progress(progress)
-                .done(done)
-                .reviewed(reviewed)
                 .build();
     }
+
+    public static MemberFitnessResDTO.DoneReviewedGroupDTO toGroupDto2(
+            List<MemberFitness> memberFitnessList, Map<Long, String> imageUrlMap) {
+
+        Map<Status, List<MemberFitnessResDTO.MemberFitnessPreviewDTO>> groupedDtos = memberFitnessList.stream()
+                .map(memberFitness -> MemberFitnessConverter.toDto(memberFitness, imageUrlMap.getOrDefault(memberFitness.getFitness().getId(), null)))
+                .collect(Collectors.groupingBy(
+                        MemberFitnessResDTO.MemberFitnessPreviewDTO::getStatus,
+                        Collectors.toList()
+                ));
+
+        return MemberFitnessResDTO.DoneReviewedGroupDTO.builder()
+                .done(groupedDtos.getOrDefault(Status.DONE, List.of()))
+                .reviewed(groupedDtos.getOrDefault(Status.REVIEWED, List.of()))
+                .build();
+    }
+
+    public static MemberFitnessResDTO.PagedDoneReviewedGroupDTO toPagedGroupDto(
+            List<MemberFitness> memberFitnessList, Map<Long, String> imageUrlMap, boolean hasNext) {
+        MemberFitnessResDTO.DoneReviewedGroupDTO groupDTO = toGroupDto2(memberFitnessList, imageUrlMap);
+
+        // 다음 커서 계산
+        Long nextCursor = memberFitnessList.isEmpty() ? null
+                : memberFitnessList.get(memberFitnessList.size() - 1).getId();
+
+        return MemberFitnessResDTO.PagedDoneReviewedGroupDTO.builder()
+                .group(groupDTO)
+                .hasNext(hasNext)
+                .nextCursor(nextCursor)
+                .build();
+    }
+
 }
