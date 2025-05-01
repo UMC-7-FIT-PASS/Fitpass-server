@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -38,4 +39,10 @@ public interface MemberFitnessRepository extends JpaRepository<MemberFitness, Lo
     int countAllByActiveTimeGreaterThanEqualAndActiveTimeLessThan(LocalDateTime greaterThan, LocalDateTime lessThan);
 
     List<MemberFitness> findAllByStatusIsAndCreatedAtLessThan(Status status, LocalDateTime createdAt);
+
+    @Query("SELECT m FROM MemberFitness m WHERE m.member.id = :memberId AND m.status IN :statuses ORDER BY m.id DESC")
+    Slice<MemberFitness> findByMemberAndStatusInFirstPage(@Param("memberId") Long memberId, @Param("statuses") List<Status> statuses, Pageable pageable);
+
+    @Query("SELECT m FROM MemberFitness m WHERE m.member.id = :memberId AND m.status IN :statuses AND m.id < :cursorId ORDER BY m.id DESC")
+    Slice<MemberFitness> findByMemberAndStatusInWithCursor(@Param("memberId") Long memberId, @Param("statuses") List<Status> statuses, @Param("cursorId") Long cursorId, Pageable pageable);
 }

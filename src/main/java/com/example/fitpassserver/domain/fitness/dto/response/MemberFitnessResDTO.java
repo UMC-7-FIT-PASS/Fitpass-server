@@ -52,18 +52,31 @@ public class MemberFitnessResDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    public static class MemberFitnessGroupDTO {
+    public static class NoneProgressGroupDTO {
         @Schema(description = "NONE 상태의 패스 리스트")
         private List<MemberFitnessPreviewDTO> none;
 
         @Schema(description = "PROGRESS 상태의 패스 리스트")
         private List<MemberFitnessPreviewDTO> progress;
-
-        @Schema(description = "DONE 상태의 패스 리스트")
-        private List<MemberFitnessPreviewDTO> done;
-
-        @Schema(description = "REVIEWED 상태의 패스 리스트")
-        private List<MemberFitnessPreviewDTO> reviewed;
     }
 
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class DoneReviewedGroupDTO {
+        @Schema(description = "DONE 상태의 패스 리스트")
+        private List<MemberFitnessResDTO.MemberFitnessPreviewDTO> done;
+        @Schema(description = "REVIEWED 상태의 패스 리스트")
+        private List<MemberFitnessResDTO.MemberFitnessPreviewDTO> reviewed;
+    }
+
+    @Getter
+    @Builder
+    public static class PagedDoneReviewedGroupDTO{
+        public DoneReviewedGroupDTO group;
+        public boolean hasNext;
+        public Long nextCursor;
+    }
 }

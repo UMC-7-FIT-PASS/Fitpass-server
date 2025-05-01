@@ -43,14 +43,28 @@ public class MemberFitnessController {
     }
 
     @Operation(
-            summary = "보유 패스 조회",
-            description = "사용자의 보유 패스 정보를 조회합니다. 패스 상태는 3가지(NONE, PROGRESS, DONE)로 나눠서 조회됩니다."
+            summary = "보유 패스 조회(NONE, PROGRESS)",
+            description = "사용자의 보유 패스 정보를 조회합니다. 패스 상태는 2가지(NONE, PROGRESS)로 나눠서 조회됩니다."
     )
     @GetMapping
-    public ApiResponse<MemberFitnessResDTO.MemberFitnessGroupDTO> getPassList(
+    public ApiResponse<MemberFitnessResDTO.NoneProgressGroupDTO> getPassList1(
             @Parameter(description = "현재 인증된 사용자 정보", hidden = true)
             @CurrentMember Member member) {
-        MemberFitnessResDTO.MemberFitnessGroupDTO result = memberFitnessService.getPassList(member.getLoginId());
+        MemberFitnessResDTO.NoneProgressGroupDTO result = memberFitnessService.getNoneAndProgressPassList1(member.getLoginId());
+        return ApiResponse.onSuccess(result);
+    }
+
+    @Operation(
+            summary = "보유 패스 조회(DONE, REVIEWED)",
+            description = "사용자의 보유 패스 정보를 조회합니다. 패스 상태는 2가지(DONE, REVIEWED)로 나눠서 조회됩니다."
+    )
+    @GetMapping("/page")
+    public ApiResponse<MemberFitnessResDTO.PagedDoneReviewedGroupDTO> getPassList2(
+            @RequestParam(required = false) Long cursor,
+            @RequestParam int size,
+            @Parameter(description = "현재 인증된 사용자 정보", hidden = true)
+            @CurrentMember Member member) {
+        MemberFitnessResDTO.PagedDoneReviewedGroupDTO result = memberFitnessService.getDoneAndReviewedPassList(cursor, size, member.getLoginId());
         return ApiResponse.onSuccess(result);
     }
 

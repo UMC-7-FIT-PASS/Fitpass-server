@@ -14,11 +14,10 @@ import com.example.fitpassserver.domain.member.exception.MemberErrorCode;
 import com.example.fitpassserver.domain.member.exception.MemberException;
 import com.example.fitpassserver.domain.member.repository.MemberRepository;
 import com.example.fitpassserver.domain.review.service.ReviewReminderService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,7 +41,7 @@ public class MemberFitnessService {
          }
      }
 
-    public MemberFitnessResDTO.MemberFitnessGroupDTO getPassList(String id) {
+    public MemberFitnessResDTO.NoneProgressGroupDTO getNoneAndProgressPassList1(String id) {
         // 유저 찾기
         Member member = memberRepository.findByLoginId(id)
                 .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND));
@@ -60,7 +59,35 @@ public class MemberFitnessService {
                         fitnessImageService::getFitnessImage
                 ));
 
-        return MemberFitnessConverter.toGroupDto(memberFitnessList, imageUrlMap);
+        return MemberFitnessConverter.toGroupDto1(memberFitnessList, imageUrlMap);
+    }
+
+    public MemberFitnessResDTO.PagedDoneReviewedGroupDTO getDoneAndReviewedPassList(Long cursor, int size, String id) {
+        Member member = memberRepository.findByLoginId(id)
+                .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND));
+
+        PageRequest pageable = PageRequest.of(0, size);
+
+        Slice<MemberFitness> memberFitnessSlice;
+        if(cursor == null || cursor == 0){
+            memberFitnessSlice = memberFitnessRepository.findByMemberAndStatusInFirstPage(member.getId(), List.of(Status.DONE, Status.REVIEWED), pageable);
+        }else{
+            memberFitnessSlice = memberFitnessRepository.findByMemberAndStatusInWithCursor(member.getId(), List.of(Status.DONE, Status.REVIEWED), cursor, pageable);
+        }
+
+        List<MemberFitness> memberFitnessList = memberFitnessSlice.getContent();
+
+        // 이미지 조회
+        Map<Long, String> imageUrlMap = memberFitnessList.stream()
+                .map(MemberFitness::getFitness)
+                .map(Fitness::getId)
+                .distinct()
+                .collect(Collectors.toMap(
+                        fitnessId -> fitnessId,
+                        fitnessImageService::getFitnessImage
+                ));
+
+        return MemberFitnessConverter.toPagedGroupDto(memberFitnessList, imageUrlMap, memberFitnessSlice.hasNext());
     }
 
     public void usePass(Member member, Long passId, boolean isAgree){
