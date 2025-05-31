@@ -71,6 +71,10 @@ dependencies {
 
     // Port one
     implementation 'io.portone:server-sdk:0.17.2'
+
+    // Monitoring
+    implementation 'com.github.loki4j:loki-logback-appender:1.4.1'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
 }
 
 tasks.named('test') {
