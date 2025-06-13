@@ -16,7 +16,7 @@
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3MDVsbyIsImlkIjoyLCJyb2xlIjoiTUVNQkVSIiwiaWF0IjoxNzQ3MzY4ODM3LCJleHAiOjE3NDczNzI0Mzd9.uWmJY8HJ--N_qE7jqowfeNAbRvwvu3kMtZ6y50MTzTU"
+                "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaWQiOjEsInJvbGUiOiJHVUVTVCIsImlhdCI6MTc0OTc5MzAxNCwiZXhwIjoxNzQ5Nzk2NjE0fQ.iDudnBtAvQv4q8J1c2znUqISiMIOumafCc_KNy54qMw"
             },
             body: JSON.stringify({
                 itemId: "coin-500",  // 테스트용 상품 ID
@@ -46,11 +46,11 @@
 
         if (payment.code == null) {
             // 3. 결제 성공시 서버에 결제 완료 알림
-            const completeResponse = await fetch("http://localhost:8080/api/payment/complete", {
+            const completeResponse = await fetch("http://localhost:8080/coin/pay/payment/complete", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3MDVsbyIsImlkIjoyLCJyb2xlIjoiTUVNQkVSIiwiaWF0IjoxNzQ3MzY4ODM3LCJleHAiOjE3NDczNzI0Mzd9.uWmJY8HJ--N_qE7jqowfeNAbRvwvu3kMtZ6y50MTzTU"
+                    "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaWQiOjEsInJvbGUiOiJHVUVTVCIsImlhdCI6MTc0OTc5MzAxNCwiZXhwIjoxNzQ5Nzk2NjE0fQ.iDudnBtAvQv4q8J1c2znUqISiMIOumafCc_KNy54qMw"
                 },
                 body: JSON.stringify({ paymentId: payment.paymentId })
             });

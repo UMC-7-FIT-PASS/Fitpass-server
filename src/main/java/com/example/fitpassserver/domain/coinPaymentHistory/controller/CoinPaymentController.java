@@ -84,10 +84,11 @@ public class CoinPaymentController {
 
     @Operation(summary = "포트원 결제를 완료합니다. 결제 상태를 검증하고 동기화합니다.")
     @PostMapping("/payment/complete")
-    public Mono<PaymentDTO> completePayment(
+    public ApiResponse<PaymentDTO> completePayment(
             @CurrentMember Member member,
             @RequestBody CompletePaymentRequest completePaymentRequest
     ) {
-        return pgPaymentCommandService.syncPayment(completePaymentRequest.paymentId(), member);
+        PaymentDTO dto = pgPaymentCommandService.syncPayment(completePaymentRequest.paymentId(), member).block();
+        return ApiResponse.onSuccess(dto);
     }
 }
