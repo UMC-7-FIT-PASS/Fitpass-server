@@ -37,26 +37,38 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Transactional
 @Slf4j
-public class FitnessAdminServiceImpl implements FitnessAdminService{
+public class FitnessAdminServiceImpl implements FitnessAdminService {
     private final FitnessRepository fitnessRepository;
     private final FitnessImageRepository fitnessImageRepository;
     private final S3Service s3Service;
     private final OwnerRepository ownerRepository;
     private final FitnessImageService fitnessImageService;
 
-    private String generateMainImageKey(Long fitnessId, String originalFilename){
+    private String generateMainImageKey(Long fitnessId, String originalFilename) {
         return String.format("fitness/%d/main/%s/%s", fitnessId, UUID.randomUUID(), originalFilename);
     }
-    private String generateAdditionalImageKey(Long fitnessId, String originalFilename){
+
+    private String generateAdditionalImageKey(Long fitnessId, String originalFilename) {
         return String.format("fitness/%d/additional/%s/%s", fitnessId, UUID.randomUUID(), originalFilename);
     }
 
     @Override
     public Long createFitness(MultipartFile mainImage, List<MultipartFile> additionalImages, FitnessAdminRequestDTO.FitnessReqDTO dto) throws IOException {
+        // 로그인 아이디 사업자 조회
+        Owner owner = ownerRepository.findByLoginId(dto.getLoginId())
+                .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND));
+
         // 우선 Fitness 엔티티를 생성
         Fitness fitness = FitnessAdminConverter.toEntity(dto);
-        fitnessRepository.save(fitness); // ID 생성됨
-        Long fitnessId = fitness.getId(); // 생성된 ID 가져오기
+
+        // fitness 맴버 매핑
+        fitness.setOwner(owner);
+
+        // 생성
+        fitnessRepository.save(fitness);
+
+        // 생성된 ID 가져오기
+        Long fitnessId = fitness.getId();
 
         // 메인 이미지 업로드 - key만 저장
         String mainImageKey = generateMainImageKey(fitnessId, mainImage.getOriginalFilename());
@@ -65,8 +77,8 @@ public class FitnessAdminServiceImpl implements FitnessAdminService{
 
         // 추가 이미지 업로드 - key만 저장
         List<String> additionalImageUrls = new ArrayList<>();
-        if(additionalImages != null && !additionalImages.isEmpty()){
-            for(MultipartFile image : additionalImages){
+        if (additionalImages != null && !additionalImages.isEmpty()) {
+            for (MultipartFile image : additionalImages) {
                 String imageKey = generateAdditionalImageKey(fitnessId, image.getOriginalFilename());
                 s3Service.uploadFile(image, imageKey);
                 additionalImageUrls.add(imageKey);
@@ -78,19 +90,12 @@ public class FitnessAdminServiceImpl implements FitnessAdminService{
         fitness.setCategoryList(categoryList);
 
 
-        if(!additionalImageUrls.isEmpty()){
+        if (!additionalImageUrls.isEmpty()) {
             List<FitnessImage> fitnessImages = FitnessImageConverter.saveFitnessImage(additionalImageUrls, fitness);
             fitnessImageRepository.saveAll(fitnessImages);
             fitness.setAdditionalImages(fitnessImages);
         }
 
-        // 로그인 아이디 사업자 조회
-        Owner owner = ownerRepository.findByLoginId(dto.getLoginId())
-                .orElseThrow(() -> new MemberException(MemberErrorCode.NOT_FOUND));
-
-
-        // fitness 맴버 매핑
-        fitness.setOwner(owner);
 
         // 시설 저장
         fitnessRepository.save(fitness);
