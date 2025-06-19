@@ -17,6 +17,7 @@ import com.example.fitpassserver.domain.member.exception.MemberErrorCode;
 import com.example.fitpassserver.domain.member.exception.MemberException;
 import com.example.fitpassserver.global.aws.s3.service.S3Service;
 import com.example.fitpassserver.owner.owner.entity.Owner;
+import com.example.fitpassserver.owner.owner.entity.OwnerStatus;
 import com.example.fitpassserver.owner.owner.repository.OwnerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -99,6 +100,9 @@ public class FitnessAdminServiceImpl implements FitnessAdminService {
 
         // 시설 저장
         fitnessRepository.save(fitness);
+
+        // owner status 변경
+        owner.updateOwnerStatus(OwnerStatus.OPERATION);
 
         return fitness.getId();
     }
