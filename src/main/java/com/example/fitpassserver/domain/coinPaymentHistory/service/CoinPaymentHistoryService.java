@@ -15,23 +15,22 @@ import com.example.fitpassserver.domain.coinPaymentHistory.exception.KakaoPayErr
 import com.example.fitpassserver.domain.coinPaymentHistory.exception.KakaoPayException;
 import com.example.fitpassserver.domain.coinPaymentHistory.repository.CoinPaymentRepository;
 import com.example.fitpassserver.domain.member.entity.Member;
-import com.example.fitpassserver.domain.plan.dto.response.PlanSubscriptionResponseDTO;
-import com.example.fitpassserver.domain.plan.dto.response.SubscriptionResponseDTO;
 import com.example.fitpassserver.domain.plan.entity.PlanType;
 import com.example.fitpassserver.domain.plan.entity.PlanTypeEntity;
 import com.example.fitpassserver.domain.plan.exception.PlanErrorCode;
 import com.example.fitpassserver.domain.plan.exception.PlanException;
 import com.example.fitpassserver.domain.plan.repository.PlanRepository;
 import com.example.fitpassserver.domain.plan.repository.PlanTypeRepository;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -48,14 +47,14 @@ public class CoinPaymentHistoryService {
         return createSinglePayCoin(member, dto.tid(), dto.amount().total(), coin, KAKAOPAY);
     }
 
-    public CoinPaymentHistory createNewCoinPaymentByScheduler(Member member, SubscriptionResponseDTO dto, Coin coin) {
-        return createPlanCoin(member, dto.item_name(), dto.tid(), dto.amount().total(), coin, KAKAOPAY);
-    }
-
-    public CoinPaymentHistory createNewCoinPaymentByPlan(Member member, PlanSubscriptionResponseDTO dto,
-                                                         Coin coin) {
-        return createPlanCoin(member, dto.itemName(), dto.tid(), dto.amount().total(), coin, KAKAOPAY);
-    }
+//    public CoinPaymentHistory createNewCoinPaymentByScheduler(Member member, SubscriptionResponseDTO dto, Coin coin) {
+//        return createPlanCoin(member, dto.item_name(), dto.tid(), dto.amount().total(), coin, KAKAOPAY);
+//    }
+//
+//    public CoinPaymentHistory createNewCoinPaymentByPlan(Member member, PlanSubscriptionResponseDTO dto,
+//                                                         Coin coin) {
+//        return createPlanCoin(member, dto.itemName(), dto.tid(), dto.amount().total(), coin, KAKAOPAY);
+//    }
 
     public CoinPaymentHistory createNewCoinPaymentByPGSinglePay(Member member, PortOneResponseDTO.SearchSinglePaymentDTO dto, Coin coin) {
         return createSinglePayCoin(member, dto.id(), dto.amount().paid(), coin, PGPAY);

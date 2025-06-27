@@ -19,19 +19,19 @@ import com.example.fitpassserver.domain.coinPaymentHistory.service.NewCoinPaymen
 import com.example.fitpassserver.domain.member.entity.Member;
 import com.example.fitpassserver.domain.plan.entity.Plan;
 import com.example.fitpassserver.domain.plan.repository.PlanTypeRepository;
-import com.example.fitpassserver.domain.plan.service.PlanService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.portone.sdk.server.payment.PaidPayment;
 import io.portone.sdk.server.payment.PaymentClient;
 import io.portone.sdk.server.payment.VirtualAccountIssuedPayment;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -41,7 +41,6 @@ public class PGPaymentCommandServiceImpl implements PGPaymentCommandService {
 
     private final CoinService coinService;
     private final CoinPaymentHistoryService coinPaymentHistoryService;
-    private final PlanService planService;
     private final PlanTypeRepository planTypeRepository;
     private final CoinTypeRepository coinTypeRepository;
 
