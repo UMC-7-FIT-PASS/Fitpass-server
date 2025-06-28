@@ -6,9 +6,6 @@ import com.example.fitpassserver.admin.management.dto.response.ManagementAdminRe
 import java.util.List;
 
 public interface ManagementAdminService {
-    void updateAllPlans(List<ManagementAdminRequestDTO.UpdatePlanManagementDTO> requestList);
-
-    List<ManagementAdminResponseDTO.PlanInfoDTO> getAllPlans();
 
     void updateAllCoins(List<ManagementAdminRequestDTO.UpdateCoinManagementDTO> requestList);
 
